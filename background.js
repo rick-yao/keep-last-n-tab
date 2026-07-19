@@ -52,7 +52,7 @@ async function reconcileWindow(windowId) {
 
   const tabs = await chrome.tabs.query({ windowId });
   if (tabs.length <= protectedTabCount) {
-    await chrome.tabs.create({ windowId, active: false });
+    await chrome.tabs.create({ windowId, active: true });
   }
 }
 

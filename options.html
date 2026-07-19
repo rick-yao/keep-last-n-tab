@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Last Tab Keeper 设置</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      body {
+        margin: 0;
+        min-width: 320px;
+        color: CanvasText;
+        background: Canvas;
+      }
+
+      main {
+        box-sizing: border-box;
+        max-width: 520px;
+        padding: 24px;
+      }
+
+      h1 {
+        margin: 0 0 20px;
+        font-size: 20px;
+        font-weight: 650;
+        letter-spacing: 0;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 14px;
+        font-weight: 600;
+      }
+
+      input {
+        box-sizing: border-box;
+        width: 112px;
+        min-height: 36px;
+        padding: 6px 10px;
+        font: inherit;
+      }
+
+      p {
+        max-width: 440px;
+        margin: 12px 0 0;
+        color: color-mix(in srgb, CanvasText 72%, Canvas);
+        font-size: 13px;
+        line-height: 1.5;
+      }
+
+      .status {
+        min-height: 20px;
+        margin-top: 14px;
+        color: #16833a;
+        font-size: 13px;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Last Tab Keeper 设置</h1>
+
+      <label for="protectedTabCount">保留标签数</label>
+      <input id="protectedTabCount" type="number" min="1" max="50" step="1" inputmode="numeric">
+      <p>例如设置为 2 时，当关闭标签后窗口只剩 2 个标签页，插件会立即新建一个空白标签页。</p>
+      <div id="status" class="status" role="status" aria-live="polite"></div>
+    </main>
+
+    <script src="options.js"></script>
+  </body>
+</html>

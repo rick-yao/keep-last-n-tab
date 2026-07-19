@@ -5,7 +5,9 @@ const scheduledWindows = new Map();
 chrome.runtime.onInstalled.addListener(async () => {
   const current = await chrome.storage.sync.get(STORAGE_KEY);
   if (!Number.isInteger(current[STORAGE_KEY])) {
-    await chrome.storage.sync.set({ [STORAGE_KEY]: DEFAULT_PROTECTED_TAB_COUNT });
+    await chrome.storage.sync.set({
+      [STORAGE_KEY]: DEFAULT_PROTECTED_TAB_COUNT,
+    });
   }
 });
 

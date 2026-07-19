@@ -65,6 +65,31 @@ node --check options.js
 
 After editing files, reload the unpacked extension from `chrome://extensions`.
 
+## Automated Releases
+
+This repository includes a GitHub Actions workflow at `.github/workflows/release.yml`.
+
+On every push to `main`, the workflow:
+
+1. Validates the extension files.
+2. Packs the extension as a `.crx` file.
+3. Creates a GitHub Release tagged as `build-<short-commit-sha>`.
+4. Uploads the `.crx` file to that release.
+
+For stable extension IDs across releases, add a repository secret named `CRX_PRIVATE_KEY_BASE64`.
+
+To create the secret from an existing Chrome extension private key:
+
+```sh
+base64 -i extension.pem | pbcopy
+```
+
+Then add the copied value in GitHub:
+
+`Settings` > `Secrets and variables` > `Actions` > `New repository secret`
+
+If `CRX_PRIVATE_KEY_BASE64` is not configured, the workflow still creates a `.crx`, but Chrome generates a temporary signing key and the extension ID may change between releases.
+
 ## License
 
 No license has been added yet. Add a license before publishing if you want others to have explicit rights to use, modify, and redistribute the project.

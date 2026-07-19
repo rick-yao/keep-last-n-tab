@@ -87,7 +87,7 @@ Use the `.zip` release asset for normal manual installation:
 
 Do not select the `.crx` file with **Load unpacked**. Chrome expects a directory there and may report `CRX_FILE_NOT_READABLE` for packaged files.
 
-For stable extension IDs across releases, add a repository secret named `CRX_PRIVATE_KEY_BASE64`.
+For stable extension IDs across releases, add a repository secret named `CRX_PRIVATE_KEY_BASE64`. Release builds require this secret.
 
 To create the secret from an existing Chrome extension private key:
 
@@ -99,7 +99,11 @@ Then add the copied value in GitHub:
 
 `Settings` > `Secrets and variables` > `Actions` > `New repository secret`
 
-If `CRX_PRIVATE_KEY_BASE64` is not configured, the workflow still creates a `.crx`, but Chrome generates a temporary signing key and the extension ID may change between releases.
+If `CRX_PRIVATE_KEY_BASE64` is not configured, the release workflow fails instead of publishing an extension with an unstable ID.
+
+The release workflow derives the public key from this secret and injects it into the release-only `manifest.json` as `key`. This keeps the extension ID stable even when the `.zip` is extracted to a different local folder before using **Load unpacked**.
+
+If you installed an older release before this workflow existed, remove the old duplicate extension once. Future releases signed with the same key should use the same extension ID.
 
 ## License
 

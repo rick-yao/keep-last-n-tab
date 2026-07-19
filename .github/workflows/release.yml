@@ -32,6 +32,34 @@ jobs:
           cp manifest.json background.js options.html options.js dist/extension/
           cp -R icons dist/extension/
 
+      - name: Apply release extension key
+        env:
+          CRX_PRIVATE_KEY_BASE64: ${{ secrets.CRX_PRIVATE_KEY_BASE64 }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "${CRX_PRIVATE_KEY_BASE64:-}" ]; then
+            echo "CRX_PRIVATE_KEY_BASE64 is required so release builds keep a stable extension ID." >&2
+            exit 1
+          fi
+
+          printf '%s' "$CRX_PRIVATE_KEY_BASE64" | base64 --decode > dist/release/extension.pem
+          chmod 600 dist/release/extension.pem
+
+          manifest_key="$(openssl rsa -in dist/release/extension.pem -pubout -outform DER 2>/dev/null | openssl base64 -A)"
+          MANIFEST_KEY="$manifest_key" python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          manifest_path = Path("dist/extension/manifest.json")
+          manifest = json.loads(manifest_path.read_text())
+          manifest["key"] = os.environ["MANIFEST_KEY"]
+          manifest_path.write_text(json.dumps(manifest, indent=2) + "\n")
+          PY
+
+          python3 -m json.tool dist/extension/manifest.json > /dev/null
+
       - name: Build unpacked zip
         run: |
           set -euo pipefail
@@ -44,8 +72,6 @@ jobs:
           ls -lh "dist/release/$zip_name"
 
       - name: Pack CRX
-        env:
-          CRX_PRIVATE_KEY_BASE64: ${{ secrets.CRX_PRIVATE_KEY_BASE64 }}
         run: |
           set -euo pipefail
 
@@ -55,16 +81,9 @@ jobs:
             exit 1
           fi
 
-          pack_args=("--pack-extension=$PWD/dist/extension")
-          if [ -n "${CRX_PRIVATE_KEY_BASE64:-}" ]; then
-            printf '%s' "$CRX_PRIVATE_KEY_BASE64" | base64 --decode > dist/release/extension.pem
-            chmod 600 dist/release/extension.pem
-            pack_args+=("--pack-extension-key=$PWD/dist/release/extension.pem")
-          else
-            echo "::warning::CRX_PRIVATE_KEY_BASE64 is not set. Chrome will generate a temporary key, so the extension ID may change between releases."
-          fi
-
-          "$chrome_bin" "${pack_args[@]}"
+          "$chrome_bin" \
+            "--pack-extension=$PWD/dist/extension" \
+            "--pack-extension-key=$PWD/dist/release/extension.pem"
 
           version="$(python3 -c 'import json; print(json.load(open("manifest.json"))["version"])')"
           short_sha="${GITHUB_SHA::7}"

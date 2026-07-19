@@ -1,4 +1,4 @@
-name: Release CRX
+name: Release Extension
 
 on:
   push:
@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   release:
-    name: Build and release CRX
+    name: Build and release extension
     runs-on: ubuntu-latest
 
     steps:
@@ -31,6 +31,17 @@ jobs:
           mkdir -p dist/extension dist/release
           cp manifest.json background.js options.html options.js dist/extension/
           cp -R icons dist/extension/
+
+      - name: Build unpacked zip
+        run: |
+          set -euo pipefail
+
+          version="$(python3 -c 'import json; print(json.load(open("manifest.json"))["version"])')"
+          short_sha="${GITHUB_SHA::7}"
+          zip_name="last-tab-keeper-${version}-${short_sha}.zip"
+
+          (cd dist/extension && zip -qr "../release/$zip_name" .)
+          ls -lh "dist/release/$zip_name"
 
       - name: Pack CRX
         env:
@@ -72,13 +83,12 @@ jobs:
           version="$(python3 -c 'import json; print(json.load(open("manifest.json"))["version"])')"
           tag="build-${short_sha}"
           title="Last Tab Keeper ${version} (${short_sha})"
-          crx_file="$(find dist/release -name '*.crx' -type f | head -n 1)"
 
           if gh release view "$tag" >/dev/null 2>&1; then
-            gh release upload "$tag" "$crx_file" --clobber
+            gh release upload "$tag" dist/release/*.crx dist/release/*.zip --clobber
           else
-            gh release create "$tag" "$crx_file" \
+            gh release create "$tag" dist/release/*.crx dist/release/*.zip \
               --target "$GITHUB_SHA" \
               --title "$title" \
-              --notes "Automated CRX release for commit $GITHUB_SHA."
+              --notes "Automated extension release for commit $GITHUB_SHA. Use the zip file for Load unpacked installs; use the CRX file only when you specifically need a packaged extension."
           fi

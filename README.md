@@ -72,9 +72,20 @@ This repository includes a GitHub Actions workflow at `.github/workflows/release
 On every push to `main`, the workflow:
 
 1. Validates the extension files.
-2. Packs the extension as a `.crx` file.
-3. Creates a GitHub Release tagged as `build-<short-commit-sha>`.
-4. Uploads the `.crx` file to that release.
+2. Builds an unpacked extension `.zip` file.
+3. Packs the extension as a `.crx` file.
+4. Creates a GitHub Release tagged as `build-<short-commit-sha>`.
+5. Uploads the `.zip` and `.crx` files to that release.
+
+Use the `.zip` release asset for normal manual installation:
+
+1. Download the `.zip`.
+2. Unzip it locally.
+3. Open `chrome://extensions`.
+4. Enable **Developer mode**.
+5. Click **Load unpacked** and select the unzipped folder.
+
+Do not select the `.crx` file with **Load unpacked**. Chrome expects a directory there and may report `CRX_FILE_NOT_READABLE` for packaged files.
 
 For stable extension IDs across releases, add a repository secret named `CRX_PRIVATE_KEY_BASE64`.
 

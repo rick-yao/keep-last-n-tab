@@ -1,5 +1,7 @@
 # Last Tab Keeper
 
+[中文说明](README.zh-CN.md)
+
 Last Tab Keeper is a small Chrome extension that keeps a browser window open when closing tabs would otherwise leave only a configured number of tabs.
 
 It is inspired by Firefox's `browser.tabs.closeWindowWithLastTab` preference. Chrome does not expose the same setting, so this extension watches tab close events and immediately opens a blank tab when the active window reaches the protected tab threshold.
@@ -9,6 +11,7 @@ It is inspired by Firefox's `browser.tabs.closeWindowWithLastTab` preference. Ch
 - Keeps Chrome windows alive when closing the last tabs.
 - Configurable protected tab count.
 - Defaults to `1`, which means closing the final tab creates a replacement blank tab.
+- Activates the replacement blank tab immediately.
 - Works per normal Chrome window.
 - No tracking, no external requests, and no page content access.
 
@@ -19,7 +22,7 @@ If the protected tab count is set to `2`:
 1. A window has 3 tabs.
 2. You close one tab.
 3. The window now has 2 tabs.
-4. Last Tab Keeper immediately opens a blank tab, bringing the window back to 3 tabs.
+4. Last Tab Keeper immediately opens and switches to a blank tab, bringing the window back to 3 tabs.
 
 This keeps the final 2 tabs protected from closing the window.
 
